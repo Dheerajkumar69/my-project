@@ -64,12 +64,15 @@ body {
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: rgba(57, 56, 56, 0.9); /* Translucent white background */
+    background-color: rgba(57, 56, 56, 0.9);
+    /* Translucent white background */
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
-    border-radius: 5px; /* Rounded corners */
-    padding: 10px 0; /* Add padding for better spacing */
+    border-radius: 5px;
+    /* Rounded corners */
+    padding: 10px 0;
+    /* Add padding for better spacing */
 }
 
 .dropdown-content .dropdown-item {
@@ -80,11 +83,13 @@ body {
     border: none;
     background: none;
     text-align: left;
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
+    transition: background-color 0.3s;
+    /* Smooth transition for hover effect */
 }
 
 .dropdown-content .dropdown-item:hover {
-    background-color: rgba(0, 122, 204, 0.2); /* Light blue hover effect */
+    background-color: rgba(0, 122, 204, 0.2);
+    /* Light blue hover effect */
 }
 
 .menu-button {
@@ -335,21 +340,31 @@ body {
     color: rgba(255, 255, 255, 0.4);
     margin: 0 8px;
 }
+
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none;
+    /* Hidden by default */
+    position: fixed;
+    /* Stay in place */
+    z-index: 1000;
+    /* Sit on top */
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
-    justify-content: center; /* Center horizontally */
-    align-items: center; /* Center vertically */
+    width: 100%;
+    /* Full width */
+    height: 100%;
+    /* Full height */
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Black w/ opacity */
+    justify-content: center;
+    /* Center horizontally */
+    align-items: center;
+    /* Center vertically */
 }
 
 .modal-content {
-    background: #252526; /* Dark background */
+    background: #252526;
+    /* Dark background */
     padding: 20px;
     border-radius: 5px;
     color: white;
@@ -359,12 +374,14 @@ body {
 
 .modal-buttons {
     display: flex;
-    justify-content: space-around; /* Space buttons evenly */
+    justify-content: space-around;
+    /* Space buttons evenly */
     margin-top: 20px;
 }
 
 .modal-buttons .menu-button {
-    background: #007acc; /* Button color */
+    background: #007acc;
+    /* Button color */
     color: white;
     padding: 10px 20px;
     border: none;
@@ -373,5 +390,6 @@ body {
 }
 
 .modal-buttons .menu-button:hover {
-    background: #005f99; /* Darker shade on hover */
+    background: #005f99;
+    /* Darker shade on hover */
 }
