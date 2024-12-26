@@ -21,7 +21,7 @@ const languageNames = {
 let files = {};
 let currentFile = null;
 
-
+// Load files from localStorage
 if (localStorage.getItem('files')) {
     files = JSON.parse(localStorage.getItem('files'));
 }
@@ -68,71 +68,64 @@ function updateTabs() {
     });
 }
 
-// Show dropdown on button click
-document.getElementById('file-button').addEventListener('click', function () {
-    const dropdown = document.getElementById('file-dropdown');
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-});
+function updateLineNumbers() {
+    const codeArea = document.getElementById('code-area');
+    const lineNumbers = document.getElementById('line-numbers');
+    const lines = codeArea.value.split('\n');
+    const numbers = Array.from({ length: lines.length }, (_, i) => i + 1).join('\n');
+    lineNumbers.textContent = numbers;
+}
 
-// Hide dropdown when clicking outside
-window.addEventListener('click', function (event) {
-    if (!event.target.matches('#file-button')) {
-        const dropdowns = document.getElementsByClassName("dropdown-content");
-        for (let i = 0; i < dropdowns.length; i++) {
-            dropdowns[i].style.display = "none";
-        }
-    }
-});
+function updateCursorPosition() {
+    const codeArea = document.getElementById('code-area');
+    const position = codeArea.selectionStart;
+    const text = codeArea.value.substring(0, position);
+    const lines = text.split('\n');
+    const currentLine = lines.length;
+    const currentColumn = lines[lines.length - 1].length + 1;
 
-// Add functionality to dropdown items
-document.getElementById('new-text-file').addEventListener('click', function () {
-    createFile('untitled.txt');
-});
+    document.getElementById('cursor-position').textContent =
+        `Ln ${currentLine}, Col ${currentColumn}`;
+}
 
-document.getElementById('new-file').addEventListener('click', function () {
-    document.getElementById('new-file-modal').style.display = 'flex';
-});
+function updateStatusBar() {
+    const codeArea = document.getElementById('code-area');
+    const text = codeArea.value;
+    const lines = text.split('\n');
+    const characters = text.length;
+    const words = text.trim() ? text.trim().split(/\s+/).length : 0;
 
-document.getElementById('open-file').addEventListener('click', function () {
-    // Implement open file functionality
-    alert('Open File functionality not implemented yet.');
-});
+    document.getElementById('stats').textContent =
+        `Lines: ${lines.length} Words: ${words} Characters: ${characters}`;
+}
 
-document.getElementById('open-folder').addEventListener('click', function () {
-    // Implement open folder functionality
-    alert('Open Folder functionality not implemented yet.');
-});
-
-document.getElementById('save-file').addEventListener('click', function () {
-    saveToLocalStorage();
-    alert('File saved!');
-});
-
-document.getElementById('save-all').addEventListener('click', function () {
-    // Implement save all functionality
-    alert('Save All functionality not implemented yet.');
-});
 function createFile(filename) {
     files[filename] = '';
     currentFile = filename;
-    document.getElementById('code-area').value = '';
+    const codeArea = document.getElementById('code-area');
+    codeArea.value = '';
     saveToLocalStorage();
     updateFileList();
     updateTabs();
+    updateLineNumbers();
+    updateCursorPosition();
+    updateStatusBar();
 }
 
 function openFile(filename) {
     currentFile = filename;
-    document.getElementById('code-area').value = files[filename];
+    const codeArea = document.getElementById('code-area');
+    codeArea.value = files[filename];
     updateFileList();
     updateTabs();
+    updateLineNumbers();
+    updateCursorPosition();
+    updateStatusBar();
 }
 
 function deleteFile(filename) {
-    // Show the delete confirmation modal
     document.getElementById('delete-file-modal').style.display = 'flex';
 
-    // Handle the confirmation button
     document.getElementById('modal-confirm-delete').onclick = function () {
         if (confirm(`Are you sure you want to delete ${filename}?`)) {
             delete files[filename];
@@ -147,34 +140,40 @@ function deleteFile(filename) {
             saveToLocalStorage();
             updateFileList();
             updateTabs();
-            document.getElementById('delete-file-modal').style.display = 'none'; // Hide modal after deletion
+            updateLineNumbers();
+            updateCursorPosition();
+            updateStatusBar();
+            document.getElementById('delete-file-modal').style.display = 'none';
         }
     };
 
-    // Handle the cancel button
     document.getElementById('modal-cancel-delete').onclick = function () {
-        document.getElementById('delete-file-modal').style.display = 'none'; // Hide modal on cancel
+        document.getElementById('delete-file-modal').style.display = 'none';
     };
 }
 
+// Event Listeners
+document.getElementById('file-button').addEventListener('click', function () {
+    const dropdown = document.getElementById('file-dropdown');
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+});
 
-document.getElementById('language-dropdown').addEventListener('change', function (e) {
-    const language = e.target.value;
-    if (language) {
-        document.getElementById('language-select').style.display = 'none';
-        document.getElementById('editor-container').style.display = 'flex';
-        document.getElementById('language-status').textContent = languageNames[language];
-
-
-        const extension = languageExtensions[language];
-        createFile(`untitled.${extension}`);
+window.addEventListener('click', function (event) {
+    if (!event.target.matches('#file-button')) {
+        const dropdowns = document.getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdowns.length; i++) {
+            dropdowns[i].style.display = "none";
+        }
     }
+});
+
+document.getElementById('new-text-file').addEventListener('click', function () {
+    createFile('untitled.txt');
 });
 
 document.getElementById('new-file').addEventListener('click', function () {
     document.getElementById('new-file-modal').style.display = 'flex';
 });
-
 
 document.getElementById('modal-cancel').addEventListener('click', function () {
     document.getElementById('new-file-modal').style.display = 'none';
@@ -189,147 +188,12 @@ document.getElementById('modal-create').addEventListener('click', function () {
     }
 });
 
-
-document.getElementById('download-file').addEventListener('click', function () {
-    if (currentFile && files[currentFile]) {
-        const blob = new Blob([files[currentFile]], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = currentFile;
-        a.click();
-        URL.revokeObjectURL(url);
-    }
-});
-
-document.getElementById('save-file').addEventListener('click', function () {
-    saveToLocalStorage();
-    alert('File saved!');
-});
-
-
-if (Object.keys(files).length > 0) {
-    document.getElementById('language-select').style.display = 'none';
-    document.getElementById('editor-container').style.display = 'flex';
-    currentFile = Object.keys(files)[0];
-    document.getElementById('code-area').value = files[currentFile];
-    updateFileList();
-    updateTabs();
-}
-
-
-function updateLineNumbers() {
-    const codeArea = document.getElementById('code-area');
-    const lineNumbers = document.getElementById('line-numbers');
-    const lines = codeArea.value.split('\n');
-    const numbers = lines.map((_, i) => i + 1).join('\n');
-    lineNumbers.textContent = numbers;
-}
-
-
-function updateCursorPosition() {
-    const codeArea = document.getElementById('code-area');
-    const position = codeArea.selectionStart;
-    const text = codeArea.value.substring(0, position);
-    const lines = text.split('\n');
-    const currentLine = lines.length;
-    const currentColumn = lines[lines.length - 1].length + 1;
-
-    document.getElementById('cursor-position').textContent =
-        `Ln ${currentLine}, Col ${currentColumn}`;
-}
-
-
-function updateStatusBar() {
-    const codeArea = document.getElementById('code-area');
-    const lines = codeArea.value.split('\n');
-    const characters = codeArea.value.length;
-    document.getElementById('stats').textContent =
-        `Lines: ${lines.length}  Characters: ${characters}`;
-}
-
-
 document.getElementById('code-area').addEventListener('input', function (e) {
     if (currentFile) {
         files[currentFile] = e.target.value;
         saveToLocalStorage();
-        updateLineNumbers();
-        updateStatusBar();
-    }
-});
-
-document.getElementById('code-area').addEventListener('keydown', function (e) {
-    if (e.key === 'Tab') {
-        e.preventDefault();
-        const start = this.selectionStart;
-        const end = this.selectionEnd;
-        this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
-        this.selectionStart = this.selectionEnd = start + 4;
-        if (currentFile) {
-            files[currentFile] = this.value;
-            saveToLocalStorage();
-        }
-    }
-});
-
-document.getElementById('code-area').addEventListener('click', updateCursorPosition);
-document.getElementById('code-area').addEventListener('keyup', updateCursorPosition);
-document.getElementById('code-area').addEventListener('scroll', function () {
-    document.getElementById('line-numbers').scrollTop = this.scrollTop;
-});
-
-
-function initializeEditor() {
-    if (Object.keys(files).length > 0) {
-        document.getElementById('language-select').style.display = 'none';
-        document.getElementById('editor-container').style.display = 'flex';
-        currentFile = Object.keys(files)[0];
-        document.getElementById('code-area').value = files[currentFile];
-        updateFileList();
-        updateTabs();
         updateLineNumbers();
         updateCursorPosition();
-        updateStatusBar();
-    }
-}
-
-
-window.addEventListener('load', initializeEditor);
-
-
-function updateLineNumbers() {
-    const codeArea = document.getElementById('code-area');
-    const lineNumbers = document.getElementById('line-numbers');
-    const lines = codeArea.value.split('\n');
-    lineNumbers.innerHTML = lines.map((_, i) => i + 1).join('<br>');
-}
-
-function updateCursorPosition() {
-    const codeArea = document.getElementById('code-area');
-    const position = codeArea.selectionStart;
-    const text = codeArea.value.substring(0, position);
-    const lines = text.split('\n');
-    const currentLine = lines.length;
-    const currentColumn = lines[lines.length - 1].length + 1;
-
-    document.getElementById('cursor-position').textContent =
-        `Ln ${currentLine}, Col ${currentColumn}`;
-}
-
-function updateStatusBar() {
-    const codeArea = document.getElementById('code-area');
-    const lines = codeArea.value.split('\n');
-    const characters = codeArea.value.length;
-    document.getElementById('stats').textContent =
-        `Lines: ${lines.length} Characters: ${characters}`;
-}
-
-// Modify the code-area event listeners
-document.getElementById('code-area').addEventListener('input', function (e) {
-    if (currentFile) {
-        files[currentFile] = e.target.value;
-        saveToLocalStorage();
-        updateLineNumbers();
         updateStatusBar();
     }
 });
@@ -345,48 +209,41 @@ document.getElementById('code-area').addEventListener('keydown', function (e) {
             files[currentFile] = this.value;
             saveToLocalStorage();
             updateLineNumbers();
+            updateCursorPosition();
             updateStatusBar();
         }
     }
 });
 
-document.getElementById('code-area').addEventListener('click', updateCursorPosition);
-document.getElementById('code-area').addEventListener('keyup', updateCursorPosition);
-document.getElementById('code-area').addEventListener('scroll', function () {
-    document.getElementById('line-numbers').scrollTop = this.scrollTop;
+document.getElementById('code-area').addEventListener('click', () => {
+    updateCursorPosition();
+    updateStatusBar();
 });
 
-
-function createFile(filename) {
-    files[filename] = '';
-    currentFile = filename;
-    document.getElementById('code-area').value = '';
-    saveToLocalStorage();
-    updateFileList();
-    updateTabs();
-    updateLineNumbers();
-    updateStatusBar();
+document.getElementById('code-area').addEventListener('keyup', () => {
     updateCursorPosition();
-}
-
-
-function openFile(filename) {
-    currentFile = filename;
-    document.getElementById('code-area').value = files[filename];
-    updateFileList();
-    updateTabs();
-    updateLineNumbers();
     updateStatusBar();
-    updateCursorPosition();
-}
+});
 
+document.getElementById('language-dropdown').addEventListener('change', function (e) {
+    const language = e.target.value;
+    if (language) {
+        document.getElementById('language-select').style.display = 'none';
+        document.getElementById('editor-container').style.display = 'flex';
+        document.getElementById('language-status').textContent = languageNames[language];
+        const extension = languageExtensions[language];
+        createFile(`untitled.${extension}`);
+    }
+});
 
+// Initialize editor
 function initializeEditor() {
     if (Object.keys(files).length > 0) {
         document.getElementById('language-select').style.display = 'none';
         document.getElementById('editor-container').style.display = 'flex';
         currentFile = Object.keys(files)[0];
-        document.getElementById('code-area').value = files[currentFile];
+        const codeArea = document.getElementById('code-area');
+        codeArea.value = files[currentFile];
         updateFileList();
         updateTabs();
         updateLineNumbers();
@@ -394,3 +251,6 @@ function initializeEditor() {
         updateStatusBar();
     }
 }
+
+// Initialize on load
+window.addEventListener('load', initializeEditor);
