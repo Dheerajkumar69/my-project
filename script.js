@@ -127,24 +127,22 @@ function deleteFile(filename) {
     document.getElementById('delete-file-modal').style.display = 'flex';
 
     document.getElementById('modal-confirm-delete').onclick = function () {
-        if (confirm(`Are you sure you want to delete ${filename}?`)) {
-            delete files[filename];
-            if (currentFile === filename) {
-                currentFile = Object.keys(files)[0] || null;
-                if (currentFile) {
-                    document.getElementById('code-area').value = files[currentFile];
-                } else {
-                    document.getElementById('code-area').value = '';
-                }
+        delete files[filename];
+        if (currentFile === filename) {
+            currentFile = Object.keys(files)[0] || null;
+            if (currentFile) {
+                document.getElementById('code-area').value = files[currentFile];
+            } else {
+                document.getElementById('code-area').value = '';
             }
-            saveToLocalStorage();
-            updateFileList();
-            updateTabs();
-            updateLineNumbers();
-            updateCursorPosition();
-            updateStatusBar();
-            document.getElementById('delete-file-modal').style.display = 'none';
         }
+        saveToLocalStorage();
+        updateFileList();
+        updateTabs();
+        updateLineNumbers();
+        updateCursorPosition();
+        updateStatusBar();
+        document.getElementById('delete-file-modal').style.display = 'none';
     };
 
     document.getElementById('modal-cancel-delete').onclick = function () {
@@ -238,18 +236,8 @@ document.getElementById('language-dropdown').addEventListener('change', function
 
 // Initialize editor
 function initializeEditor() {
-    if (Object.keys(files).length > 0) {
-        document.getElementById('language-select').style.display = 'none';
-        document.getElementById('editor-container').style.display = 'flex';
-        currentFile = Object.keys(files)[0];
-        const codeArea = document.getElementById('code-area');
-        codeArea.value = files[currentFile];
-        updateFileList();
-        updateTabs();
-        updateLineNumbers();
-        updateCursorPosition();
-        updateStatusBar();
-    }
+    document.getElementById('language-select').style.display = 'flex';
+    document.getElementById('editor-container').style.display = 'none';
 }
 
 // Initialize on load

@@ -10,7 +10,6 @@ body {
     height: 100vh;
 }
 
-
 .language-select {
     height: 100vh;
     display: flex;
@@ -42,7 +41,6 @@ body {
     border-radius: 4px;
 }
 
-
 .editor-container {
     display: none;
     height: 100vh;
@@ -65,14 +63,11 @@ body {
     display: none;
     position: absolute;
     background-color: rgba(57, 56, 56, 0.9);
-    /* Translucent white background */
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
     border-radius: 5px;
-    /* Rounded corners */
     padding: 10px 0;
-    /* Add padding for better spacing */
 }
 
 .dropdown-content .dropdown-item {
@@ -84,20 +79,13 @@ body {
     background: none;
     text-align: left;
     transition: background-color 0.3s;
-    /* Smooth transition for hover effect */
 }
 
 .dropdown-content .dropdown-item:hover {
     background-color: rgba(0, 122, 204, 0.2);
-    /* Light blue hover effect */
 }
 
 .menu-button {
-    .menu-button i {
-        margin-right: 5px;
-        color: white;
-    }
-
     background: #444;
     border: none;
     color: white;
@@ -247,7 +235,6 @@ body {
     color: rgba(255, 255, 255, 0.4);
 }
 
-
 .modal {
     display: none;
     position: fixed;
@@ -281,7 +268,6 @@ body {
     justify-content: flex-end;
     gap: 10px;
     margin-top: 10px;
-
 }
 
 .line-numbers {
@@ -298,7 +284,6 @@ body {
     overflow-y: hidden;
 }
 
-/* Update the line numbers styling */
 .editor {
     flex: 1;
     display: flex;
@@ -338,7 +323,6 @@ body {
     tab-size: 4;
 }
 
-/* Enhanced VS Code-like styling */
 .tab-bar {
     background-color: #252526;
     display: flex;
@@ -428,7 +412,6 @@ body {
     color: rgba(255, 255, 255, 0.4);
 }
 
-/* Menu styling */
 .menu-bar {
     background-color: #333333;
     padding: 2px 8px;
@@ -468,7 +451,6 @@ body {
     color: #ffffff;
 }
 
-/* Modal styling */
 .modal {
     background-color: rgba(0, 0, 0, 0.4);
 }
