@@ -351,3 +351,15 @@ document.getElementById('find-replace-confirm').addEventListener('click', functi
     }
     document.getElementById('find-replace-modal').style.display = 'none';
 });
+
+document.getElementById('theme-toggle-button').addEventListener('click', function () {
+    const body = document.body;
+    const themeToggleButton = document.getElementById('theme-toggle-button');
+    if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        themeToggleButton.textContent = 'Light Mode';
+    } else {
+        body.classList.add('light-mode');
+        themeToggleButton.textContent = 'Dark Mode';
+    }
+});

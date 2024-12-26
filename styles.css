@@ -10,6 +10,94 @@ body {
     height: 100vh;
 }
 
+body.light-mode {
+    background: #f5f5f5;
+    color: #333333;
+}
+
+body.light-mode .menu-bar,
+body.light-mode .tab-bar,
+body.light-mode .explorer,
+body.light-mode .status-bar,
+body.light-mode .modal-content,
+body.light-mode .find-replace-content,
+body.light-mode .context-menu {
+    background: #ffffff;
+    color: #333333;
+    border: 1px solid #e0e0e0;
+}
+
+body.light-mode .menu-button,
+body.light-mode .dropdown-content,
+body.light-mode .dropdown-item,
+body.light-mode .file-item,
+body.light-mode .tab,
+body.light-mode .line-numbers,
+body.light-mode #code-area {
+    background: #ffffff;
+    color: #333333;
+}
+
+body.light-mode .tab.active,
+body.light-mode .file-item.active {
+    background: #e0e0e0;
+}
+
+body.light-mode .tab-close,
+body.light-mode .context-menu-item {
+    color: #333333;
+}
+
+body.light-mode .tab-close:hover,
+body.light-mode .context-menu-item:hover {
+    background: #d0d0d0;
+    color: #333333;
+}
+
+body.light-mode .modal input,
+body.light-mode .find-replace-content input {
+    background: #ffffff;
+    border: 1px solid #cccccc;
+    color: #333333;
+}
+
+body.light-mode .modal-buttons button,
+body.light-mode .find-replace-buttons button {
+    background: #007acc;
+    color: #ffffff;
+}
+
+body.light-mode .modal-buttons button:hover,
+body.light-mode .find-replace-buttons button:hover {
+    background: #005f99;
+}
+
+.theme-toggle-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #333;
+    color: #ffffff;
+    border: none;
+    padding: 3px 6px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.theme-toggle-button:hover {
+    background: #444;
+}
+
+body.light-mode .theme-toggle-button {
+    background: #e0e0e0;
+    color: #333333;
+}
+
+body.light-mode .theme-toggle-button:hover {
+    background: #d0d0d0;
+}
+
 .language-select {
     height: 100vh;
     display: flex;
