@@ -40,6 +40,7 @@
                 <div class="dropdown-content" id="file-dropdown">
                     <button class="dropdown-item" id="new-text-file">New Text File</button>
                     <button class="dropdown-item" id="new-file">New File</button>
+                    <button class="dropdown-item" id="new-folder">New Folder</button> <!-- New Folder option -->
                     <button class="dropdown-item" id="open-file">Open File</button>
                     <button class="dropdown-item" id="open-folder">Open Folder</button>
                     <button class="dropdown-item" id="save-file">Save</button>
@@ -60,20 +61,31 @@
         </div>
 
         <div class="main-content">
-            <div class="tab-bar" id="tab-bar">
-                <!-- Tabs will be added here -->
+            <div class="vertical-section">
+                <div class="logo" id="toggle-explorer">
+                    <i class="fas fa-folder"></i>
+                </div>
             </div>
+            
             <div class="editor-wrapper">
-                <div class="explorer">
+                <div class="explorer" id="explorer">
                     <div>EXPLORER</div>
                     <div class="file-list" id="file-list">
                         <!-- Files will be listed here -->
                     </div>
                 </div>
 
-                <div class="editor">
-                    <div class="line-numbers" id="line-numbers">1</div>
-                    <textarea id="code-area" spellcheck="false"></textarea>
+                <div class="editor-content">
+                    <div class="tab-bar" id="tab-bar">
+                        <!-- Tabs will be added here -->
+                    </div>
+                    <div class="editor">
+                        <div class="line-numbers" id="line-numbers">1</div>
+                        <textarea id="code-area" spellcheck="false"></textarea>
+                        <div class="minimap" id="minimap">
+                            <pre class="minimap-content" id="minimap-content"></pre>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -128,12 +140,37 @@
         </div>
     </div>
 
+    <!-- New Folder Modal -->
+    <div class="modal" id="new-folder-modal">
+        <div class="modal-content">
+            <h2>Create New Folder</h2>
+            <input type="text" id="new-foldername" placeholder="Enter folder name">
+            <div class="modal-buttons">
+                <button class="menu-button" id="modal-cancel-folder">Cancel</button>
+                <button class="menu-button" id="modal-create-folder">Create</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Context Menu -->
     <div class="context-menu" id="context-menu">
         <div class="context-menu-item" id="rename">Rename</div>
         <div class="context-menu-item" id="cut">Cut</div>
         <div class="context-menu-item" id="copy">Copy</div>
         <div class="context-menu-item" id="paste">Paste</div>
+        <div class="context-menu-item" id="new-file-in-folder">New File in Folder</div> <!-- New option -->
+    </div>
+
+    <!-- New File in Folder Modal -->
+    <div class="modal" id="new-file-in-folder-modal">
+        <div class="modal-content">
+            <h2>Create New File in Folder</h2>
+            <input type="text" id="new-filename-in-folder" placeholder="Enter filename">
+            <div class="modal-buttons">
+                <button class="menu-button" id="modal-cancel-file-in-folder">Cancel</button>
+                <button class="menu-button" id="modal-create-file-in-folder">Create</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>

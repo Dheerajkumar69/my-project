@@ -20,6 +20,7 @@ const languageNames = {
 
 let files = {};
 let currentFile = null;
+let currentFolder = null;
 
 // Load files from localStorage
 if (localStorage.getItem('files')) {
@@ -35,17 +36,44 @@ function updateFileList() {
     fileList.innerHTML = '';
     Object.keys(files).forEach(filename => {
         const fileItem = document.createElement('div');
-        fileItem.className = `file-item ${currentFile === filename ? 'active' : ''}`;
-        fileItem.innerHTML = `
-            <span>${filename}</span>
-            <span class="tab-close" onclick="deleteFile('${filename}')">×</span>
-        `;
-        fileItem.onclick = (e) => {
-            if (!e.target.classList.contains('tab-close')) {
-                openFile(filename);
-            }
-        };
-        fileList.appendChild(fileItem);
+        if (typeof files[filename] === 'object') {
+            fileItem.className = 'file-item folder';
+            fileItem.innerHTML = `
+                <span class="folder-arrow" onclick="toggleFolder('${filename}')">▶</span>
+                <span>${filename}</span>
+            `;
+            const folderContent = document.createElement('div');
+            folderContent.className = 'folder-content';
+            folderContent.id = `folder-${filename}`;
+            Object.keys(files[filename]).forEach(subfile => {
+                const subfileItem = document.createElement('div');
+                subfileItem.className = `file-item ${currentFile === subfile ? 'active' : ''}`;
+                subfileItem.innerHTML = `
+                    <span>${subfile}</span>
+                    <span class="tab-close" onclick="deleteFile('${filename}/${subfile}')">×</span>
+                `;
+                subfileItem.onclick = (e) => {
+                    if (!e.target.classList.contains('tab-close')) {
+                        openFile(`${filename}/${subfile}`);
+                    }
+                };
+                folderContent.appendChild(subfileItem);
+            });
+            fileList.appendChild(fileItem);
+            fileList.appendChild(folderContent);
+        } else {
+            fileItem.className = `file-item ${currentFile === filename ? 'active' : ''}`;
+            fileItem.innerHTML = `
+                <span>${filename}</span>
+                <span class="tab-close" onclick="deleteFile('${filename}')">×</span>
+            `;
+            fileItem.onclick = (e) => {
+                if (!e.target.classList.contains('tab-close')) {
+                    openFile(filename);
+                }
+            };
+            fileList.appendChild(fileItem);
+        }
     });
 }
 
@@ -74,6 +102,10 @@ function updateLineNumbers() {
     const lines = codeArea.value.split('\n');
     const numbers = Array.from({ length: lines.length }, (_, i) => i + 1).join('\n');
     lineNumbers.textContent = numbers;
+    
+    // Match line height with code area
+    lineNumbers.style.lineHeight = window.getComputedStyle(codeArea).lineHeight;
+    lineNumbers.style.paddingTop = window.getComputedStyle(codeArea).paddingTop;
 }
 
 function updateCursorPosition() {
@@ -110,6 +142,15 @@ function createFile(filename) {
     updateLineNumbers();
     updateCursorPosition();
     updateStatusBar();
+    updateMinimap();
+}
+
+function createFileInFolder(foldername, filename) {
+    if (!files[foldername][filename]) {
+        files[foldername][filename] = '';
+        saveToLocalStorage();
+        updateFileList();
+    }
 }
 
 function openFile(filename) {
@@ -121,6 +162,7 @@ function openFile(filename) {
     updateLineNumbers();
     updateCursorPosition();
     updateStatusBar();
+    updateMinimap();
 }
 
 function deleteFile(filename) {
@@ -191,6 +233,40 @@ document.getElementById('modal-create').addEventListener('click', function () {
     }
 });
 
+document.getElementById('new-folder').addEventListener('click', function () {
+    document.getElementById('new-folder-modal').style.display = 'flex';
+});
+
+document.getElementById('modal-cancel-folder').addEventListener('click', function () {
+    document.getElementById('new-folder-modal').style.display = 'none';
+});
+
+document.getElementById('modal-create-folder').addEventListener('click', function () {
+    const foldername = document.getElementById('new-foldername').value;
+    if (foldername) {
+        createFolder(foldername);
+        document.getElementById('new-folder-modal').style.display = 'none';
+        document.getElementById('new-foldername').value = '';
+    }
+});
+
+document.getElementById('new-file-in-folder').addEventListener('click', function () {
+    document.getElementById('new-file-in-folder-modal').style.display = 'flex';
+});
+
+document.getElementById('modal-cancel-file-in-folder').addEventListener('click', function () {
+    document.getElementById('new-file-in-folder-modal').style.display = 'none';
+});
+
+document.getElementById('modal-create-file-in-folder').addEventListener('click', function () {
+    const filename = document.getElementById('new-filename-in-folder').value;
+    if (filename && currentFolder) {
+        createFileInFolder(currentFolder, filename);
+        document.getElementById('new-file-in-folder-modal').style.display = 'none';
+        document.getElementById('new-filename-in-folder').value = '';
+    }
+});
+
 document.getElementById('code-area').addEventListener('input', function (e) {
     if (currentFile) {
         files[currentFile] = e.target.value;
@@ -198,6 +274,7 @@ document.getElementById('code-area').addEventListener('input', function (e) {
         updateLineNumbers();
         updateCursorPosition();
         updateStatusBar();
+        updateMinimap();
     }
 });
 
@@ -259,6 +336,15 @@ document.addEventListener('contextmenu', function (e) {
     contextMenu.style.left = `${mouseX}px`;
     contextMenu.style.display = 'block';
     contextMenuVisible = true;
+
+    const target = e.target.closest('.file-item.folder');
+    if (target) {
+        currentFolder = target.querySelector('span:nth-child(2)').textContent;
+        document.getElementById('new-file-in-folder').style.display = 'block';
+    } else {
+        currentFolder = null;
+        document.getElementById('new-file-in-folder').style.display = 'none';
+    }
 });
 
 document.addEventListener('click', function () {
@@ -363,3 +449,115 @@ document.getElementById('theme-toggle-button').addEventListener('click', functio
         themeToggleButton.textContent = 'Dark Mode';
     }
 });
+
+function updateMinimap() {
+    const codeArea = document.getElementById('code-area');
+    const minimapContent = document.getElementById('minimap-content');
+    const minimap = document.getElementById('minimap');
+    
+    // Update content
+    minimapContent.textContent = codeArea.value;
+    
+    // Calculate the available height for minimap
+    const minimapHeight = minimap.clientHeight;
+    const contentHeight = codeArea.scrollHeight;
+    
+    // Calculate scale while maintaining readability
+    let scale = minimapHeight / contentHeight;
+    if (scale > 1) scale = 1; // Don't scale up if content is smaller
+    if (scale < 0.1) scale = 0.1; // Don't scale down too much
+    
+    // Apply transform
+    minimapContent.style.transform = `scale(${scale})`;
+    minimapContent.style.width = `${120 / scale}px`; // Adjust width to prevent text wrapping
+    
+    // Update slider
+    let slider = minimap.querySelector('.minimap-slider');
+    if (!slider) {
+        slider = document.createElement('div');
+        slider.className = 'minimap-slider';
+        minimap.appendChild(slider);
+    }
+    
+    // Calculate slider dimensions
+    const visiblePercentage = codeArea.clientHeight / codeArea.scrollHeight;
+    const sliderHeight = Math.max(minimapHeight * visiblePercentage, 30);
+    const scrollRatio = codeArea.scrollTop / (codeArea.scrollHeight - codeArea.clientHeight);
+    const sliderTop = (minimapHeight - sliderHeight) * scrollRatio;
+    
+    // Update slider position
+    slider.style.height = `${sliderHeight}px`;
+    slider.style.top = `${sliderTop}px`;
+}
+
+// Add resize handler to update minimap when window is resized
+window.addEventListener('resize', updateMinimap);
+
+let isDragging = false;
+let startY = 0;
+let startScroll = 0;
+
+document.addEventListener('DOMContentLoaded', function() {
+    const minimap = document.getElementById('minimap');
+    const codeArea = document.getElementById('code-area');
+
+    minimap.addEventListener('mousedown', function(e) {
+        const slider = minimap.querySelector('.minimap-slider');
+        if (e.target === slider) {
+            isDragging = true;
+            slider.classList.add('dragging'); // Add dragging class
+            startY = e.clientY;
+            startScroll = codeArea.scrollTop;
+            document.body.style.userSelect = 'none';
+        } else {
+            // Click anywhere on minimap to scroll
+            const rect = minimap.getBoundingClientRect();
+            const percentage = (e.clientY - rect.top) / rect.height;
+            codeArea.scrollTop = percentage * (codeArea.scrollHeight - codeArea.clientHeight);
+        }
+    });
+
+    document.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+            const deltaY = e.clientY - startY;
+            const percentage = deltaY / minimap.offsetHeight;
+            const scroll = startScroll + percentage * codeArea.scrollHeight;
+            codeArea.scrollTop = scroll;
+        }
+    });
+
+    document.addEventListener('mouseup', function() {
+        const slider = minimap.querySelector('.minimap-slider');
+        if (isDragging) {
+            slider.classList.remove('dragging'); // Remove dragging class
+        }
+        isDragging = false;
+        document.body.style.userSelect = '';
+    });
+});
+
+// Update existing scroll handler
+document.getElementById('code-area').addEventListener('scroll', function() {
+    document.getElementById('line-numbers').scrollTop = this.scrollTop;
+    updateMinimap();
+});
+
+function createFolder(foldername) {
+    if (!files[foldername]) {
+        files[foldername] = {};
+        saveToLocalStorage();
+        updateFileList();
+    }
+}
+
+function toggleFolder(foldername) {
+    const folderContent = document.getElementById(`folder-${foldername}`);
+    const folderArrow = folderContent.previousElementSibling.querySelector('.folder-arrow');
+    if (folderContent.style.display === 'none') {
+        folderContent.style.display = 'block';
+        folderArrow.textContent = '▼';
+    } else {
+        folderContent.style.display = 'none';
+        folderArrow.textContent = '▶';
+    }
+}

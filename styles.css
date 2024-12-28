@@ -133,6 +133,7 @@ body.light-mode .theme-toggle-button:hover {
     display: none;
     height: 100vh;
     flex-direction: column;
+    overflow: hidden; /* Prevent container from scrolling */
 }
 
 .menu-bar {
@@ -153,7 +154,7 @@ body.light-mode .theme-toggle-button:hover {
     background-color: rgba(57, 56, 56, 0.9);
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1;
+    z-index: 1000; /* Ensure dropdowns appear on top */
     border-radius: 5px;
     padding: 10px 0;
 }
@@ -187,26 +188,44 @@ body.light-mode .theme-toggle-button:hover {
 }
 
 .tab-bar {
+    background-color: #252526;
     display: flex;
-    background: #252526;
-    padding: 0 10px;
     overflow-x: auto;
+    height: 35px;
+    border-bottom: 1px solid #404040;
+    width: 100%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .tab {
-    padding: 8px 20px;
-    background: #2d2d2d;
-    color: #fff;
+    padding: 8px 16px;
+    background-color: #2d2d2d;
+    color: #969696;
     border: none;
-    margin-right: 2px;
+    border-right: 1px solid #404040;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 8px;
+    min-width: 120px;
+    max-width: 200px;
+    height: 100%;
+    justify-content: space-between; /* Ensure space between name and close button */
+}
+
+.tab .tab-close {
+    margin-left: 8px; /* Add margin to move the close button away from the name */
 }
 
 .tab.active {
-    background: #1e1e1e;
+    background: linear-gradient(145deg, #1e1e1e, #2d2d2d);
+    color: #007acc;
+    border-top: 2px solid #007acc;
+}
+
+.tab:hover {
+    background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+    color: #007acc;
 }
 
 .tab-close {
@@ -218,6 +237,7 @@ body.light-mode .theme-toggle-button:hover {
     align-items: center;
     justify-content: center;
     font-size: 12px;
+    transition: background 0.3s, color 0.3s;
 }
 
 .tab-close:hover {
@@ -229,11 +249,15 @@ body.light-mode .theme-toggle-button:hover {
     display: flex;
     flex: 1;
     flex-direction: column;
+    overflow: hidden; /* Prevent main content from scrolling */
 }
 
 .editor-wrapper {
     display: flex;
     flex: 1;
+    overflow: hidden;
+    position: relative;
+    margin-left: 50px; /* Only account for vertical section */
 }
 
 .explorer {
@@ -246,6 +270,12 @@ body.light-mode .theme-toggle-button:hover {
     flex-direction: column;
     resize: horizontal;
     overflow: auto;
+    position: fixed;
+    left: 50px; /* Account for vertical section */
+    top: 35px; /* Move to 0px below the top div */
+    bottom: 22px; /* Account for status bar */
+    height: calc(100vh - 57px); /* Adjusted to account for new top position */
+    z-index: 99;
 }
 
 .explorer > div:first-child {
@@ -283,6 +313,11 @@ body.light-mode .theme-toggle-button:hover {
     flex: 1;
     display: flex;
     position: relative;
+    background-color: #1e1e1e;
+    margin-left: 0; /* Remove any extra margin */
+    height: calc(100% - 35px);
+    margin-right: 0; /* Remove margin to align with minimap */
+    width: calc(100% - 250px); /* Adjust width to account for explorer */
 }
 
 .line-numbers {
@@ -299,19 +334,42 @@ body.light-mode .theme-toggle-button:hover {
 }
 
 #code-area {
-    width: 100%;
-    height: 100%;
-    background: #1e1e1e;
+    flex: 1;
+    background-color: #1e1e1e;
     color: #d4d4d4;
     font-family: 'Consolas', 'Courier New', monospace;
     font-size: 14px;
-    padding: 1rem;
+    line-height: 1.5;
+    padding: 8px 0;
     border: none;
     resize: none;
-    line-height: 1.5;
+    outline: none;
     white-space: pre;
     overflow-x: auto;
     tab-size: 4;
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #007acc #1e1e1e; /* For Firefox */
+    margin-left: 50px; /* Account for line numbers */
+    width: calc(100% - 170px); /* Adjust width to account for minimap and line numbers */
+}
+
+/* For WebKit browsers */
+#code-area::-webkit-scrollbar {
+    width: 12px;
+}
+
+#code-area::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+#code-area::-webkit-scrollbar-thumb {
+    background-color: #007acc;
+    border-radius: 10px;
+    border: 3px solid #1e1e1e;
+}
+
+#code-area::-webkit-scrollbar-thumb:hover {
+    background-color: #005f99;
 }
 
 #code-area:focus {
@@ -326,6 +384,11 @@ body.light-mode .theme-toggle-button:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 .status-left,
@@ -392,6 +455,10 @@ body.light-mode .theme-toggle-button:hover {
     line-height: 1.5;
     min-width: 50px;
     overflow-y: hidden;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
 }
 
 .editor {
@@ -399,6 +466,9 @@ body.light-mode .theme-toggle-button:hover {
     display: flex;
     position: relative;
     background-color: #1e1e1e;
+    margin-right: 120px; /* Add margin for minimap */
+    height: calc(100vh - 102px);
+    height: calc(100% - 35px); /* Subtract tab bar height */
 }
 
 .line-numbers {
@@ -431,6 +501,31 @@ body.light-mode .theme-toggle-button:hover {
     white-space: pre;
     overflow-x: auto;
     tab-size: 4;
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #007acc #1e1e1e; /* For Firefox */
+    margin-left: 50px; /* Account for line numbers */
+    width: calc(100% - 170px); /* Adjust width to account for minimap and line numbers */
+}
+
+/* For WebKit browsers */
+#code-area::-webkit-scrollbar {
+    width: 12px;
+    position: absolute;
+    right: 0; /* Move scrollbar to the extreme right */
+}
+
+#code-area::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+#code-area::-webkit-scrollbar-thumb {
+    background-color: #007acc;
+    border-radius: 10px;
+    border: 3px solid #1e1e1e;
+}
+
+#code-area::-webkit-scrollbar-thumb:hover {
+    background-color: #005f99;
 }
 
 .tab-bar {
@@ -454,6 +549,11 @@ body.light-mode .theme-toggle-button:hover {
     min-width: 120px;
     max-width: 200px;
     height: 100%;
+    justify-content: space-between; /* Ensure space between name and close button */
+}
+
+.tab .tab-close {
+    margin-left: 8px; /* Add margin to move the close button away from the name */
 }
 
 .tab.active {
@@ -472,6 +572,12 @@ body.light-mode .theme-toggle-button:hover {
     flex-direction: column;
     resize: horizontal;
     overflow: auto;
+    position: fixed; /* Fix explorer position */
+    left: 50px; /* Next to vertical section */
+    top: 35px; /* Move to 0px below the top div */
+    bottom: 22px; /* Account for status bar */
+    height: calc(100vh - 57px); /* Adjusted to account for new top position */
+    z-index: 99;
 }
 
 .explorer > div:first-child {
@@ -514,6 +620,11 @@ body.light-mode .theme-toggle-button:hover {
     justify-content: space-between;
     align-items: center;
     font-size: 12px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
 .status-left, .status-right {
@@ -551,6 +662,7 @@ body.light-mode .theme-toggle-button:hover {
     border: 1px solid #454545;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     padding: 4px 0;
+    z-index: 1000; /* Ensure dropdowns appear on top */
 }
 
 .dropdown-item {
@@ -725,4 +837,133 @@ body.light-mode .theme-toggle-button:hover {
 
 #find-replace-cancel:hover {
     background-color: #454545;
+}
+
+.minimap {
+    position: fixed;
+    right: 0;
+    top: 70px; /* Account for tab bar */
+    height: calc(100vh - 137px); /* Adjust for tab bar + other elements */
+    width: 120px;
+    background: #1e1e1e;
+    border-left: 1px solid #333;
+    overflow: hidden;
+    opacity: 0.8; /* Slightly more visible */
+    z-index: 10;
+    transition: opacity 0.3s ease;
+}
+
+.minimap:hover {
+    opacity: 1;
+}
+
+.minimap-slider {
+    position: absolute;
+    right: 0;
+    width: 120px;
+    background: rgba(100, 100, 100, 0.2);
+    border-radius: 0;
+    pointer-events: all;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-left: 2px solid #007acc;
+    backdrop-filter: blur(2px);
+}
+
+.minimap-slider:hover {
+    background: rgba(100, 100, 100, 0.3);
+    border-left: 2px solid #0098ff;
+}
+
+.minimap-slider::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg, 
+        rgba(0, 122, 204, 0.05), 
+        rgba(0, 122, 204, 0.1)
+    );
+}
+
+.minimap-slider.dragging {
+    background: rgba(100, 100, 100, 0.4);
+    border-left: 2px solid #00b4ff;
+}
+
+.minimap-content {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 10px;
+    line-height: 1.2;
+    color: #d4d4d4;
+    white-space: pre;
+    pointer-events: none;
+    margin: 0;
+    padding: 2px;
+    transform-origin: top left;
+    width: 120px; /* Match minimap width */
+    overflow-x: hidden;
+}
+
+body.light-mode .minimap,
+body.light-mode .minimap-content {
+    background: #ffffff;
+}
+
+.vertical-section {
+    position: fixed;
+    width: 50px;
+    height: calc(100vh - 35px); /* Adjust height to fit below the top div */
+    background-color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+    left: 0;
+    top: 35px; /* Move to 0px below the top div */
+    border-right: 1px solid #444;
+    z-index: 100;
+}
+
+.vertical-section .logo {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #858585;
+    transition: color 0.2s;
+}
+
+.vertical-section .logo:hover {
+    color: #fff;
+}
+
+.editor-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    margin-left: 250px; /* Reduce from 300px to match explorer width */
+    height: calc(100vh - 102px);
+}
+
+.folder {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.folder-arrow {
+    display: inline-block;
+    width: 16px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.folder-content {
+    display: none;
+    padding-left: 20px;
 }
