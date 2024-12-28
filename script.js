@@ -488,6 +488,16 @@ function updateMinimap() {
     // Update slider position
     slider.style.height = `${sliderHeight}px`;
     slider.style.top = `${sliderTop}px`;
+
+    // Update highlighted section
+    let highlight = minimap.querySelector('.minimap-highlight');
+    if (!highlight) {
+        highlight = document.createElement('div');
+        highlight.className = 'minimap-highlight';
+        minimap.appendChild(highlight);
+    }
+    highlight.style.height = `${sliderHeight}px`;
+    highlight.style.top = `${sliderTop}px`;
 }
 
 // Add resize handler to update minimap when window is resized
