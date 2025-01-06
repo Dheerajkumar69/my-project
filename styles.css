@@ -8,6 +8,8 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: #1e1e1e;
     height: 100vh;
+    border-radius: 10px; /* Add rounded corners */
+    overflow: hidden; /* Prevent overflow */
 }
 
 body.light-mode {
@@ -110,7 +112,7 @@ body.light-mode .theme-toggle-button:hover {
     background: rgb(209, 190, 190);
     backdrop-filter: blur(1px);
     padding: 2rem;
-    border-radius: 8px;
+    border-radius: 10px; /* Round corners */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     text-align: center;
 }
@@ -130,7 +132,7 @@ body.light-mode .theme-toggle-button:hover {
 }
 
 .editor-container {
-    display: none;
+    display: flex; /* Change from 'none' to 'flex' */
     height: 100vh;
     flex-direction: column;
     overflow: hidden; /* Prevent container from scrolling */
@@ -141,6 +143,7 @@ body.light-mode .theme-toggle-button:hover {
     padding: 8px;
     display: flex;
     gap: 10px;
+    border-radius: 10px; /* Round corners */
 }
 
 .dropdown {
@@ -154,9 +157,10 @@ body.light-mode .theme-toggle-button:hover {
     background-color: rgba(57, 56, 56, 0.9);
     min-width: 160px;
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-    z-index: 1000; /* Ensure dropdowns appear on top */
-    border-radius: 5px;
+    border-radius: 10px; /* Round corners */
     padding: 10px 0;
+    top: 100%;
+    left: 0;
 }
 
 .dropdown-content .dropdown-item {
@@ -195,6 +199,7 @@ body.light-mode .theme-toggle-button:hover {
     border-bottom: 1px solid #404040;
     width: 100%;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 10px; /* Round corners */
 }
 
 .tab {
@@ -211,16 +216,19 @@ body.light-mode .theme-toggle-button:hover {
     max-width: 200px;
     height: 100%;
     justify-content: space-between; /* Ensure space between name and close button */
+    border-radius: 10px; /* Round corners */
 }
 
 .tab .tab-close {
     margin-left: 8px; /* Add margin to move the close button away from the name */
+    border-radius: 50%; /* Make close button round */
 }
 
 .tab.active {
     background: linear-gradient(145deg, #1e1e1e, #2d2d2d);
     color: #007acc;
     border-top: 2px solid #007acc;
+    border-radius: 10px; /* Round corners */
 }
 
 .tab:hover {
@@ -230,7 +238,7 @@ body.light-mode .theme-toggle-button:hover {
 
 .tab-close {
     color: #666;
-    border-radius: 50%;
+    border-radius: 50%; /* Make close button round */
     width: 16px;
     height: 16px;
     display: flex;
@@ -254,28 +262,30 @@ body.light-mode .theme-toggle-button:hover {
 
 .editor-wrapper {
     display: flex;
+    flex-direction: row; /* Place explorer and editor side by side */
     flex: 1;
     overflow: hidden;
     position: relative;
-    margin-left: 50px; /* Only account for vertical section */
+    margin-left: 0; /* Remove margin for vertical section */
+    margin-right: 0; /* Remove margin for minimap */
 }
 
 .explorer {
     width: 250px;
-    background-color: #252526;
+    background-color: #2d2d2d; /* Darker background for explorer */
     color: #cccccc;
-    padding: 0;
+    padding: 10px; /* Add padding */
     border-right: 1px solid #404040;
     display: flex;
     flex-direction: column;
     resize: horizontal;
     overflow: auto;
-    position: fixed;
-    left: 50px; /* Account for vertical section */
-    top: 35px; /* Move to 0px below the top div */
-    bottom: 22px; /* Account for status bar */
     height: calc(100vh - 57px); /* Adjusted to account for new top position */
-    z-index: 99;
+    border-radius: 10px; /* Round corners */
+    flex-shrink: 0; /* Prevent shrinking */
+    position: relative; /* Change to relative */
+    top: 0; /* Remove top positioning */
+    bottom: 0; /* Remove bottom positioning */
 }
 
 .explorer > div:first-child {
@@ -284,7 +294,8 @@ body.light-mode .theme-toggle-button:hover {
     font-weight: bold;
     text-transform: uppercase;
     color: #bbbbbb;
-    background-color: #252526;
+    background-color: #333; /* Darker background for explorer header */
+    border-radius: 10px 10px 0 0; /* Round top corners */
 }
 
 .file-list {
@@ -292,21 +303,23 @@ body.light-mode .theme-toggle-button:hover {
 }
 
 .file-item {
-    padding: 4px 16px;
+    padding: 5px 10px; /* Add padding */
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: #cccccc;
     font-size: 13px;
+    border-radius: 5px; /* Round corners */
+    margin: 2px 0; /* Add margin between items */
 }
 
 .file-item:hover {
-    background-color: #2a2d2e;
+    background-color: #444; /* Darker hover effect */
 }
 
 .file-item.active {
-    background-color: #37373d;
+    background-color: #555; /* Darker active effect */
 }
 
 .editor {
@@ -314,10 +327,10 @@ body.light-mode .theme-toggle-button:hover {
     display: flex;
     position: relative;
     background-color: #1e1e1e;
+    height: calc(100vh - 57px - 22px - 35px); /* Adjust height to fit below the top div, above the status bar, and below the tab bar */
+    border-radius: 0 0 10px 10px; /* Round bottom corners */
     margin-left: 0; /* Remove any extra margin */
-    height: calc(100% - 35px);
-    margin-right: 0; /* Remove margin to align with minimap */
-    width: calc(100% - 250px); /* Adjust width to account for explorer */
+    width: 100%; /* Extend to the extreme right */
 }
 
 .line-numbers {
@@ -331,6 +344,11 @@ body.light-mode .theme-toggle-button:hover {
     user-select: none;
     line-height: 1.5;
     min-width: 50px;
+    overflow-y: hidden;
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
 }
 
 #code-area {
@@ -349,7 +367,8 @@ body.light-mode .theme-toggle-button:hover {
     overflow-y: auto; /* Keep vertical scrollbar functionality */
     tab-size: 4;
     margin-left: 50px; /* Account for line numbers */
-    width: calc(100% - 170px); /* Adjust width to account for minimap and line numbers */
+    width: calc(100% - 170px); /* Adjust width to touch the minimap */
+    margin-bottom: 1px; /* Add a 1px gap between the code area and the bottom div */
     scrollbar-width: none; /* Hide scrollbar for Firefox */
 }
 
@@ -374,7 +393,7 @@ body.light-mode .theme-toggle-button:hover {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    border-radius: 10px; /* Round corners */
 }
 
 .status-left,
@@ -409,7 +428,7 @@ body.light-mode .theme-toggle-button:hover {
 .modal-content {
     background: #252526;
     padding: 20px;
-    border-radius: 5px;
+    border-radius: 10px; /* Round corners */
     color: white;
 }
 
@@ -455,6 +474,7 @@ body.light-mode .theme-toggle-button:hover {
     margin-right: 120px; /* Add margin for minimap */
     height: calc(100vh - 102px);
     height: calc(100% - 35px); /* Subtract tab bar height */
+    border-radius: 10px; /* Round corners */
 }
 
 .line-numbers {
@@ -489,7 +509,8 @@ body.light-mode .theme-toggle-button:hover {
     overflow-y: auto; /* Keep vertical scrollbar functionality */
     tab-size: 4;
     margin-left: 50px; /* Account for line numbers */
-    width: calc(100% - 170px); /* Adjust width to account for minimap and line numbers */
+    width: calc(100% - 170px); /* Adjust width to touch the minimap */
+    margin-bottom: 1px; /* Add a 1px gap between the code area and the bottom div */
     scrollbar-width: none; /* Hide scrollbar for Firefox */
 }
 
@@ -536,31 +557,14 @@ body.light-mode .theme-toggle-button:hover {
     border-top: 1px solid #007acc;
 }
 
-.explorer {
-    width: 250px;
-    background-color: #252526;
-    color: #cccccc;
-    padding: 0;
-    border-right: 1px solid #404040;
-    display: flex;
-    flex-direction: column;
-    resize: horizontal;
-    overflow: auto;
-    position: fixed; /* Fix explorer position */
-    left: 50px; /* Next to vertical section */
-    top: 35px; /* Move to 0px below the top div */
-    bottom: 22px; /* Account for status bar */
-    height: calc(100vh - 57px); /* Adjusted to account for new top position */
-    z-index: 99;
-}
-
 .explorer > div:first-child {
     padding: 8px 16px;
     font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
     color: #bbbbbb;
-    background-color: #252526;
+    background-color: #333; /* Darker background for explorer header */
+    border-radius: 10px 10px 0 0; /* Round top corners */
 }
 
 .file-list {
@@ -568,21 +572,23 @@ body.light-mode .theme-toggle-button:hover {
 }
 
 .file-item {
-    padding: 4px 16px;
+    padding: 5px 10px; /* Add padding */
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
     color: #cccccc;
     font-size: 13px;
+    border-radius: 5px; /* Round corners */
+    margin: 2px 0; /* Add margin between items */
 }
 
 .file-item:hover {
-    background-color: #2a2d2e;
+    background-color: #444; /* Darker hover effect */
 }
 
 .file-item.active {
-    background-color: #37373d;
+    background-color: #555; /* Darker active effect */
 }
 
 .status-bar {
@@ -598,7 +604,7 @@ body.light-mode .theme-toggle-button:hover {
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 1000;
+    border-radius: 10px; /* Round corners */
 }
 
 .status-left, .status-right {
@@ -636,7 +642,9 @@ body.light-mode .theme-toggle-button:hover {
     border: 1px solid #454545;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     padding: 4px 0;
-    z-index: 1000; /* Ensure dropdowns appear on top */
+    border-radius: 10px; /* Round corners */
+    top: 100%;
+    left: 0;
 }
 
 .dropdown-item {
@@ -658,7 +666,7 @@ body.light-mode .theme-toggle-button:hover {
 .modal-content {
     background-color: #252526;
     border: 1px solid #454545;
-    border-radius: 4px;
+    border-radius: 10px; /* Round corners */
     padding: 16px;
 }
 
@@ -719,9 +727,10 @@ body.light-mode .theme-toggle-button:hover {
     background-color: #252526;
     border: 1px solid #454545;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    border-radius: 4px;
+    border-radius: 10px; /* Round corners */
     padding: 4px 0;
+    top: 0;
+    left: 0;
 }
 
 .context-menu-item {
@@ -761,7 +770,7 @@ body.light-mode .theme-toggle-button:hover {
 .find-replace-content {
     background: #252526;
     padding: 20px;
-    border-radius: 5px;
+    border-radius: 10px; /* Round corners */
     color: white;
     width: 300px;
 }
@@ -823,8 +832,8 @@ body.light-mode .theme-toggle-button:hover {
     border-left: 1px solid #333;
     overflow: hidden;
     opacity: 0.8; /* Slightly more visible */
-    z-index: 10;
     transition: opacity 0.3s ease;
+    border-radius: 10px; /* Round corners */
 }
 
 .minimap:hover {
@@ -868,7 +877,7 @@ body.light-mode .theme-toggle-button:hover {
     font-family: 'Consolas', 'Courier New', monospace;
     font-size: 10px;
     line-height: 1.2;
-    color: #d4d4d4;
+    color: #d4d4d4; /* Match text color with code editor in dark mode */
     white-space: pre;
     pointer-events: none;
     margin: 0;
@@ -878,6 +887,10 @@ body.light-mode .theme-toggle-button:hover {
     overflow-x: hidden;
 }
 
+body.light-mode .minimap-content {
+    color: #333333; /* Match text color with code editor in light mode */
+}
+
 .minimap-highlight {
     position: absolute;
     right: 0;
@@ -885,7 +898,14 @@ body.light-mode .theme-toggle-button:hover {
     background: rgba(100, 100, 100, 0.4); /* Highlight color */
     border-left: 2px solid #007acc;
     pointer-events: none;
-    z-index: 1;
+}
+
+.minimap-selection {
+    position: absolute;
+    right: 0;
+    width: 120px;
+    background: rgba(0, 122, 204, 0.3); /* Change highlight color to blue */
+    pointer-events: none;
 }
 
 body.light-mode .minimap,
@@ -905,7 +925,7 @@ body.light-mode .minimap-content {
     left: 0;
     top: 35px; /* Move to 0px below the top div */
     border-right: 1px solid #444;
-    z-index: 100;
+    border-radius: 10px; /* Round corners */
 }
 
 .vertical-section .logo {
@@ -927,8 +947,7 @@ body.light-mode .minimap-content {
     display: flex;
     flex-direction: column;
     flex: 1;
-    margin-left: 250px; /* Reduce from 300px to match explorer width */
-    height: calc(100vh - 102px);
+    height: 100%; /* Adjust height to fill available space */
 }
 
 .folder {
@@ -941,9 +960,45 @@ body.light-mode .minimap-content {
     width: 16px;
     text-align: center;
     cursor: pointer;
+    margin-right: 5px; /* Add margin to the right */
 }
 
 .folder-content {
     display: none;
-    padding-left: 20px;
+    padding-left: 20px; /* Add padding to the left */
+}
+    
+.alert-box {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ff4d4d;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    z-index: 1000;
+}
+
+/* Remove all z-index properties */
+body,
+.menu-bar,
+.dropdown-content,
+.tab-bar,
+.tab,
+.tab.active,
+.tab-close,
+.editor,
+.status-bar,
+.modal-content,
+.find-replace-content,
+.context-menu,
+.minimap,
+.vertical-section,
+.select-container {
+    z-index: auto;
 }

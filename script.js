@@ -34,46 +34,54 @@ function saveToLocalStorage() {
 function updateFileList() {
     const fileList = document.getElementById('file-list');
     fileList.innerHTML = '';
-    Object.keys(files).forEach(filename => {
+
+    // Separate folders and files
+    const folders = Object.keys(files).filter(filename => typeof files[filename] === 'object');
+    const regularFiles = Object.keys(files).filter(filename => typeof files[filename] !== 'object');
+
+    // Append folders first
+    folders.forEach(foldername => {
         const fileItem = document.createElement('div');
-        if (typeof files[filename] === 'object') {
-            fileItem.className = 'file-item folder';
-            fileItem.innerHTML = `
-                <span class="folder-arrow" onclick="toggleFolder('${filename}')">▶</span>
-                <span>${filename}</span>
+        fileItem.className = 'file-item folder';
+        fileItem.innerHTML = `
+            <span class="folder-arrow" onclick="toggleFolder('${foldername}')">▶</span>
+            <span>${foldername}</span>
+        `;
+        const folderContent = document.createElement('div');
+        folderContent.className = 'folder-content';
+        folderContent.id = `folder-${foldername}`;
+        Object.keys(files[foldername]).forEach(subfile => {
+            const subfileItem = document.createElement('div');
+            subfileItem.className = `file-item ${currentFile === `${foldername}/${subfile}` ? 'active' : ''}`;
+            subfileItem.innerHTML = `
+                <span>${subfile}</span>
+                <span class="tab-close" onclick="deleteFile('${foldername}/${subfile}')">×</span>
             `;
-            const folderContent = document.createElement('div');
-            folderContent.className = 'folder-content';
-            folderContent.id = `folder-${filename}`;
-            Object.keys(files[filename]).forEach(subfile => {
-                const subfileItem = document.createElement('div');
-                subfileItem.className = `file-item ${currentFile === subfile ? 'active' : ''}`;
-                subfileItem.innerHTML = `
-                    <span>${subfile}</span>
-                    <span class="tab-close" onclick="deleteFile('${filename}/${subfile}')">×</span>
-                `;
-                subfileItem.onclick = (e) => {
-                    if (!e.target.classList.contains('tab-close')) {
-                        openFile(`${filename}/${subfile}`);
-                    }
-                };
-                folderContent.appendChild(subfileItem);
-            });
-            fileList.appendChild(fileItem);
-            fileList.appendChild(folderContent);
-        } else {
-            fileItem.className = `file-item ${currentFile === filename ? 'active' : ''}`;
-            fileItem.innerHTML = `
-                <span>${filename}</span>
-                <span class="tab-close" onclick="deleteFile('${filename}')">×</span>
-            `;
-            fileItem.onclick = (e) => {
+            subfileItem.onclick = (e) => {
                 if (!e.target.classList.contains('tab-close')) {
-                    openFile(filename);
+                    openFile(`${foldername}/${subfile}`);
                 }
             };
-            fileList.appendChild(fileItem);
-        }
+            folderContent.appendChild(subfileItem);
+        });
+        fileList.appendChild(fileItem);
+        fileList.appendChild(folderContent);
+    });
+
+    // Append regular files
+    regularFiles.forEach(filename => {
+        const fileItem = document.createElement('div');
+        fileItem.className = `file-item ${currentFile === filename ? 'active' : ''}`;
+        fileItem.innerHTML = `
+            <span>${filename}</span>
+            <span class="tab-close" onclick="deleteFile('${filename}')">×</span>
+        `;
+        fileItem.onclick = (e) => {
+            if (!e.target.classList.contains('tab-close')) {
+                openFile(filename);
+            }
+        };
+        fileList.appendChild(fileItem);
     });
 }
 
@@ -90,10 +98,21 @@ function updateTabs() {
         tab.onclick = (e) => {
             if (!e.target.classList.contains('tab-close')) {
                 openFile(filename);
+                updateLanguageStatus(filename); // Update language status when tab is changed
             }
         };
         tabBar.appendChild(tab);
     });
+}
+
+function updateLanguageStatus(filename) {
+    const extension = filename.split('.').pop();
+    const language = Object.keys(languageExtensions).find(key => languageExtensions[key] === extension);
+    if (language) {
+        document.getElementById('language-status').textContent = languageNames[language];
+    } else {
+        document.getElementById('language-status').textContent = 'Unknown';
+    }
 }
 
 function updateLineNumbers() {
@@ -132,6 +151,10 @@ function updateStatusBar() {
 }
 
 function createFile(filename) {
+    if (!filename.includes('.')) {
+        showAlertWithExtensionPrompt('Filename must include an extension.', filename, createFile);
+        return;
+    }
     files[filename] = '';
     currentFile = filename;
     const codeArea = document.getElementById('code-area');
@@ -146,6 +169,10 @@ function createFile(filename) {
 }
 
 function createFileInFolder(foldername, filename) {
+    if (!filename.includes('.')) {
+        showAlertWithExtensionPrompt('Filename must include an extension.', filename, (newFilename) => createFileInFolder(foldername, newFilename));
+        return;
+    }
     if (!files[foldername][filename]) {
         files[foldername][filename] = '';
         saveToLocalStorage();
@@ -153,27 +180,83 @@ function createFileInFolder(foldername, filename) {
     }
 }
 
+function showAlert(message) {
+    const alertBox = document.createElement('div');
+    alertBox.className = 'alert-box';
+    alertBox.textContent = message;
+    document.body.appendChild(alertBox);
+    setTimeout(() => {
+        alertBox.style.opacity = '0';
+        setTimeout(() => {
+            document.body.removeChild(alertBox);
+        }, 500);
+    }, 2000);
+}
+
+function showAlertWithExtensionPrompt(message, filename, callback) {
+    const alertBox = document.createElement('div');
+    alertBox.className = 'alert-box';
+    alertBox.innerHTML = `
+        <p>${message}</p>
+        <input type="text" id="extension-input" placeholder="Enter extension">
+        <button id="extension-confirm">Confirm</button>
+    `;
+    document.body.appendChild(alertBox);
+
+    document.getElementById('extension-confirm').onclick = () => {
+        const extension = document.getElementById('extension-input').value;
+        if (extension) {
+            document.body.removeChild(alertBox);
+            callback(`${filename}.${extension}`);
+        }
+    };
+
+    setTimeout(() => {
+        alertBox.style.opacity = '0';
+        setTimeout(() => {
+            if (document.body.contains(alertBox)) {
+                document.body.removeChild(alertBox);
+            }
+        }, 500);
+    }, 5000);
+}
+
 function openFile(filename) {
     currentFile = filename;
     const codeArea = document.getElementById('code-area');
-    codeArea.value = files[filename];
+    codeArea.value = getFileContent(filename);
     updateFileList();
     updateTabs();
     updateLineNumbers();
     updateCursorPosition();
     updateStatusBar();
     updateMinimap();
+    updateLanguageStatus(filename); // Update language status when file is opened
+}
+
+function getFileContent(filename) {
+    const parts = filename.split('/');
+    let content = files;
+    parts.forEach(part => {
+        content = content[part];
+    });
+    return content;
 }
 
 function deleteFile(filename) {
     document.getElementById('delete-file-modal').style.display = 'flex';
 
     document.getElementById('modal-confirm-delete').onclick = function () {
-        delete files[filename];
+        const parts = filename.split('/');
+        let current = files;
+        for (let i = 0; i < parts.length - 1; i++) {
+            current = current[parts[i]];
+        }
+        delete current[parts[parts.length - 1]];
         if (currentFile === filename) {
             currentFile = Object.keys(files)[0] || null;
             if (currentFile) {
-                document.getElementById('code-area').value = files[currentFile];
+                document.getElementById('code-area').value = getFileContent(currentFile);
             } else {
                 document.getElementById('code-area').value = '';
             }
@@ -498,6 +581,34 @@ function updateMinimap() {
     }
     highlight.style.height = `${sliderHeight}px`;
     highlight.style.top = `${sliderTop}px`;
+
+    // Update selection highlight
+    updateMinimapSelection();
+}
+
+function updateMinimapSelection() {
+    const codeArea = document.getElementById('code-area');
+    const minimap = document.getElementById('minimap');
+    const minimapContent = document.getElementById('minimap-content');
+    
+    const selectionStart = codeArea.selectionStart;
+    const selectionEnd = codeArea.selectionEnd;
+    
+    const startLine = codeArea.value.substring(0, selectionStart).split('\n').length - 1;
+    const endLine = codeArea.value.substring(0, selectionEnd).split('\n').length - 1;
+    
+    const lineHeight = parseFloat(window.getComputedStyle(codeArea).lineHeight);
+    const scale = minimapContent.getBoundingClientRect().height / codeArea.scrollHeight;
+    
+    let selectionHighlight = minimap.querySelector('.minimap-selection');
+    if (!selectionHighlight) {
+        selectionHighlight = document.createElement('div');
+        selectionHighlight.className = 'minimap-selection';
+        minimap.appendChild(selectionHighlight);
+    }
+    
+    selectionHighlight.style.top = `${startLine * lineHeight * scale}px`;
+    selectionHighlight.style.height = `${(endLine - startLine + 1) * lineHeight * scale}px`;
 }
 
 // Add resize handler to update minimap when window is resized
@@ -551,6 +662,9 @@ document.getElementById('code-area').addEventListener('scroll', function() {
     document.getElementById('line-numbers').scrollTop = this.scrollTop;
     updateMinimap();
 });
+
+// Update selection handler
+document.getElementById('code-area').addEventListener('select', updateMinimapSelection);
 
 function createFolder(foldername) {
     if (!files[foldername]) {
