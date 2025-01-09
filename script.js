@@ -276,22 +276,48 @@ function deleteFile(filename) {
 }
 
 // Event Listeners
-document.getElementById('file-button').addEventListener('click', function () {
+document.getElementById('file-button').addEventListener('click', function (event) {
+    event.stopPropagation(); // Prevent the event from bubbling up
     const dropdown = document.getElementById('file-dropdown');
     dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    dropdown.style.top = `${event.target.offsetHeight}px`; // Position below the button
+    dropdown.style.zIndex = '10000'; // Ensure it shows on top
 });
 
-document.getElementById('edit-button').addEventListener('click', function () {
+document.getElementById('edit-button').addEventListener('click', function (event) {
+    event.stopPropagation(); // Prevent the event from bubbling up
     const dropdown = document.getElementById('edit-dropdown');
     dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    dropdown.style.top = `${event.target.offsetHeight}px`; // Position below the button
+    dropdown.style.zIndex = '10000'; // Ensure it shows on top
 });
 
-window.addEventListener('click', function (event) {
-    if (!event.target.matches('#file-button') && !event.target.matches('#edit-button')) {
-        const dropdowns = document.getElementsByClassName("dropdown-content");
-        for (let i = 0; i < dropdowns.length; i++) {
-            dropdowns[i].style.display = "none";
-        }
+document.getElementById('file-button').addEventListener('mouseenter', function (event) {
+    const dropdown = document.getElementById('file-dropdown');
+    dropdown.style.display = 'block';
+    dropdown.style.top = `${event.target.offsetHeight}px`; // Position below the button
+    dropdown.style.zIndex = '10000'; // Ensure it shows on top
+});
+
+document.getElementById('file-dropdown').addEventListener('mouseleave', function () {
+    this.style.display = 'none';
+});
+
+document.getElementById('edit-button').addEventListener('mouseenter', function (event) {
+    const dropdown = document.getElementById('edit-dropdown');
+    dropdown.style.display = 'block';
+    dropdown.style.top = `${event.target.offsetHeight}px`; // Position below the button
+    dropdown.style.zIndex = '10000'; // Ensure it shows on top
+});
+
+document.getElementById('edit-dropdown').addEventListener('mouseleave', function () {
+    this.style.display = 'none';
+});
+
+window.addEventListener('click', function () {
+    const dropdowns = document.getElementsByClassName("dropdown-content");
+    for (let i = 0; i < dropdowns.length; i++) {
+        dropdowns[i].style.display = "none";
     }
 });
 
@@ -526,10 +552,10 @@ document.getElementById('theme-toggle-button').addEventListener('click', functio
     const themeToggleButton = document.getElementById('theme-toggle-button');
     if (body.classList.contains('light-mode')) {
         body.classList.remove('light-mode');
-        themeToggleButton.textContent = 'Light Mode';
+        themeToggleButton.textContent = 'Switch to Light Mode';
     } else {
         body.classList.add('light-mode');
-        themeToggleButton.textContent = 'Dark Mode';
+        themeToggleButton.textContent = 'Switch to Dark Mode';
     }
 });
 
@@ -554,33 +580,26 @@ function updateMinimap() {
     minimapContent.style.transform = `scale(${scale})`;
     minimapContent.style.width = `${120 / scale}px`; // Adjust width to prevent text wrapping
     
-    // Update slider
-    let slider = minimap.querySelector('.minimap-slider');
-    if (!slider) {
-        slider = document.createElement('div');
-        slider.className = 'minimap-slider';
-        minimap.appendChild(slider);
-    }
-    
-    // Calculate slider dimensions
-    const visiblePercentage = codeArea.clientHeight / codeArea.scrollHeight;
-    const sliderHeight = Math.max(minimapHeight * visiblePercentage, 30);
-    const scrollRatio = codeArea.scrollTop / (codeArea.scrollHeight - codeArea.clientHeight);
-    const sliderTop = (minimapHeight - sliderHeight) * scrollRatio;
-    
-    // Update slider position
-    slider.style.height = `${sliderHeight}px`;
-    slider.style.top = `${sliderTop}px`;
-
     // Update highlighted section
-    let highlight = minimap.querySelector('.minimap-highlight');
+    let highlight = minimap.querySelector('.minimap-selection');
     if (!highlight) {
         highlight = document.createElement('div');
-        highlight.className = 'minimap-highlight';
+        highlight.className = 'minimap-selection';
         minimap.appendChild(highlight);
     }
-    highlight.style.height = `${sliderHeight}px`;
-    highlight.style.top = `${sliderTop}px`;
+    
+    // Calculate highlight dimensions
+    const visiblePercentage = codeArea.clientHeight / codeArea.scrollHeight;
+    const highlightHeight = Math.max(minimapHeight * visiblePercentage, 30);
+    const scrollRatio = codeArea.scrollTop / (codeArea.scrollHeight - codeArea.clientHeight);
+    const highlightTop = (minimapHeight - highlightHeight) * scrollRatio;
+    
+    // Update highlight position
+    highlight.style.height = `${highlightHeight}px`;
+    highlight.style.top = `${highlightTop}px`;
+
+    // Ensure the highlight is always visible
+    minimap.scrollTop = highlightTop;
 
     // Update selection highlight
     updateMinimapSelection();
@@ -589,6 +608,30 @@ function updateMinimap() {
 function updateMinimapSelection() {
     const codeArea = document.getElementById('code-area');
     const minimap = document.getElementById('minimap');
+    const minimapContent = document.getElementById('minimap-content');
+    
+    const lineHeight = parseFloat(window.getComputedStyle(codeArea).lineHeight);
+    const scale = minimapContent.getBoundingClientRect().height / codeArea.scrollHeight;
+    
+    const visibleStartLine = Math.floor(codeArea.scrollTop / lineHeight);
+    const visibleEndLine = Math.ceil((codeArea.scrollTop + codeArea.clientHeight) / lineHeight);
+    
+    let selectionHighlight = minimap.querySelector('.minimap-selection');
+    if (!selectionHighlight) {
+        selectionHighlight = document.createElement('div');
+        selectionHighlight.className = 'minimap-selection';
+        minimap.appendChild(selectionHighlight);
+    }
+    
+    selectionHighlight.style.top = `${visibleStartLine * lineHeight * scale}px`;
+    selectionHighlight.style.height = `${(visibleEndLine - visibleStartLine) * lineHeight * scale}px`;
+
+    // Update code selection highlight
+    updateMinimapCodeSelection();
+}
+
+function updateMinimapCodeSelection() {
+    const codeArea = document.getElementById('code-area');
     const minimapContent = document.getElementById('minimap-content');
     
     const selectionStart = codeArea.selectionStart;
@@ -600,15 +643,15 @@ function updateMinimapSelection() {
     const lineHeight = parseFloat(window.getComputedStyle(codeArea).lineHeight);
     const scale = minimapContent.getBoundingClientRect().height / codeArea.scrollHeight;
     
-    let selectionHighlight = minimap.querySelector('.minimap-selection');
-    if (!selectionHighlight) {
-        selectionHighlight = document.createElement('div');
-        selectionHighlight.className = 'minimap-selection';
-        minimap.appendChild(selectionHighlight);
+    let codeSelectionHighlight = minimapContent.querySelector('.minimap-code-selection');
+    if (!codeSelectionHighlight) {
+        codeSelectionHighlight = document.createElement('div');
+        codeSelectionHighlight.className = 'minimap-code-selection';
+        minimapContent.appendChild(codeSelectionHighlight);
     }
     
-    selectionHighlight.style.top = `${startLine * lineHeight * scale}px`;
-    selectionHighlight.style.height = `${(endLine - startLine + 1) * lineHeight * scale}px`;
+    codeSelectionHighlight.style.top = `${startLine * lineHeight * scale}px`;
+    codeSelectionHighlight.style.height = `${(endLine - startLine + 1) * lineHeight * scale}px`;
 }
 
 // Add resize handler to update minimap when window is resized
@@ -623,10 +666,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const codeArea = document.getElementById('code-area');
 
     minimap.addEventListener('mousedown', function(e) {
-        const slider = minimap.querySelector('.minimap-slider');
-        if (e.target === slider) {
+        const highlight = minimap.querySelector('.minimap-selection');
+        if (e.target === highlight) {
             isDragging = true;
-            slider.classList.add('dragging'); // Add dragging class
+            highlight.classList.add('dragging'); // Add dragging class
             startY = e.clientY;
             startScroll = codeArea.scrollTop;
             document.body.style.userSelect = 'none';
@@ -634,7 +677,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Click anywhere on minimap to scroll
             const rect = minimap.getBoundingClientRect();
             const percentage = (e.clientY - rect.top) / rect.height;
+            codeArea.style.scrollBehavior = 'smooth'; // Enable smooth scrolling
             codeArea.scrollTop = percentage * (codeArea.scrollHeight - codeArea.clientHeight);
+            setTimeout(() => {
+                codeArea.style.scrollBehavior = 'auto'; // Disable smooth scrolling after the scroll
+            }, 300); // Adjust the timeout duration as needed
         }
     });
 
@@ -648,12 +695,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     document.addEventListener('mouseup', function() {
-        const slider = minimap.querySelector('.minimap-slider');
+        const highlight = minimap.querySelector('.minimap-selection');
         if (isDragging) {
-            slider.classList.remove('dragging'); // Remove dragging class
+            highlight.classList.remove('dragging'); // Remove dragging class
         }
         isDragging = false;
         document.body.style.userSelect = '';
+    });
+
+    minimap.addEventListener('click', function(e) {
+        const rect = minimap.getBoundingClientRect();
+        const percentage = (e.clientY - rect.top) / rect.height;
+        codeArea.scrollTop = percentage * (codeArea.scrollHeight - codeArea.clientHeight);
     });
 });
 
@@ -661,10 +714,14 @@ document.addEventListener('DOMContentLoaded', function() {
 document.getElementById('code-area').addEventListener('scroll', function() {
     document.getElementById('line-numbers').scrollTop = this.scrollTop;
     updateMinimap();
+    updateMinimapSelection();
 });
 
 // Update selection handler
-document.getElementById('code-area').addEventListener('select', updateMinimapSelection);
+document.getElementById('code-area').addEventListener('select', function() {
+    updateMinimapSelection();
+    updateMinimapCodeSelection();
+});
 
 function createFolder(foldername) {
     if (!files[foldername]) {
@@ -685,3 +742,18 @@ function toggleFolder(foldername) {
         folderArrow.textContent = '▶';
     }
 }
+
+let activeButton = null;
+
+function handleButtonClick(event) {
+    if (activeButton && activeButton !== event.target) {
+        activeButton.disabled = false;
+    }
+    activeButton = event.target;
+    activeButton.disabled = true;
+}
+
+// Attach the handleButtonClick function to all buttons
+document.querySelectorAll('button').forEach(button => {
+    button.addEventListener('click', handleButtonClick);
+});

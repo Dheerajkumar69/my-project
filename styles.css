@@ -159,8 +159,9 @@ body.light-mode .theme-toggle-button:hover {
     box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     border-radius: 10px; /* Round corners */
     padding: 10px 0;
-    top: 100%;
+    top: 100%; /* Ensure it shows below the button */
     left: 0;
+    z-index: 10000; /* Ensure it shows on top */
 }
 
 .dropdown-content .dropdown-item {
@@ -176,6 +177,10 @@ body.light-mode .theme-toggle-button:hover {
 
 .dropdown-content .dropdown-item:hover {
     background-color: rgba(0, 122, 204, 0.2);
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
 }
 
 .menu-button {
@@ -349,6 +354,7 @@ body.light-mode .theme-toggle-button:hover {
     left: 0;
     top: 0;
     height: 100%;
+    z-index: 1; /* Ensure line numbers are on top */
 }
 
 #code-area {
@@ -366,15 +372,11 @@ body.light-mode .theme-toggle-button:hover {
     overflow-x: auto; /* Keep horizontal scrollbar functionality */
     overflow-y: auto; /* Keep vertical scrollbar functionality */
     tab-size: 4;
-    margin-left: 50px; /* Account for line numbers */
-    width: calc(100% - 170px); /* Adjust width to touch the minimap */
+    margin-left: 60px; /* Ensure code area does not overlap with line numbers */
+    width: calc(100% - 180px); /* Adjust width to touch the minimap */
     margin-bottom: 1px; /* Add a 1px gap between the code area and the bottom div */
     scrollbar-width: none; /* Hide scrollbar for Firefox */
-}
-
-/* For WebKit browsers */
-#code-area::-webkit-scrollbar {
-    display: none; /* Hide scrollbar for WebKit browsers */
+    scroll-behavior: smooth; /* Add smooth scrolling */
 }
 
 #code-area:focus {
@@ -464,6 +466,7 @@ body.light-mode .theme-toggle-button:hover {
     left: 0;
     top: 0;
     height: 100%;
+    z-index: 0; /* Ensure line numbers are on top */
 }
 
 .editor {
@@ -508,10 +511,11 @@ body.light-mode .theme-toggle-button:hover {
     overflow-x: auto; /* Keep horizontal scrollbar functionality */
     overflow-y: auto; /* Keep vertical scrollbar functionality */
     tab-size: 4;
-    margin-left: 50px; /* Account for line numbers */
-    width: calc(100% - 170px); /* Adjust width to touch the minimap */
+    margin-left: 60px; /* Ensure code area does not overlap with line numbers */
+    width: calc(100% - 100px); /* Adjust width to touch the minimap */
     margin-bottom: 1px; /* Add a 1px gap between the code area and the bottom div */
     scrollbar-width: none; /* Hide scrollbar for Firefox */
+    scroll-behavior: smooth; /* Add smooth scrolling */
 }
 
 /* For WebKit browsers */
@@ -826,51 +830,19 @@ body.light-mode .theme-toggle-button:hover {
     position: fixed;
     right: 0;
     top: 70px; /* Account for tab bar */
-    height: calc(100vh - 137px); /* Adjust for tab bar + other elements */
+    height: calc(100vh - 100px); /* Adjust for tab bar + other elements */
     width: 120px;
-    background: #1e1e1e;
+    background: #2e2e2e; /* Make minimap background slightly lighter */
     border-left: 1px solid #333;
-    overflow: hidden;
-    opacity: 0.8; /* Slightly more visible */
+    overflow-y: auto; /* Allow vertical scrolling */
+    opacity: 1; /* Slightly more visible */
     transition: opacity 0.3s ease;
     border-radius: 10px; /* Round corners */
+    pointer-events: auto; /* Allow interaction */
 }
 
 .minimap:hover {
     opacity: 1;
-}
-
-.minimap-slider {
-    position: absolute;
-    right: 0;
-    width: 120px;
-    background: rgba(100, 100, 100, 0.2);
-    border-radius: 0;
-    pointer-events: all;
-    cursor: pointer;
-    transition: background 0.2s ease;
-    border-left: 2px solid #007acc;
-    backdrop-filter: blur(2px);
-}
-
-.minimap-slider:hover {
-    background: rgba(100, 100, 100, 0.2); /* Remove highlighting effect */
-    border-left: 2px solid #007acc; /* Keep the border color consistent */
-}
-
-.minimap-slider::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    background: none; /* Remove gradient background */
-}
-
-.minimap-slider.dragging {
-    background: rgba(100, 100, 100, 0.4);
-    border-left: 2px solid #00b4ff;
 }
 
 .minimap-content {
@@ -885,19 +857,11 @@ body.light-mode .theme-toggle-button:hover {
     transform-origin: top left;
     width: 120px; /* Match minimap width */
     overflow-x: hidden;
+    opacity: 0.7; /* Make text more visible */
 }
 
 body.light-mode .minimap-content {
     color: #333333; /* Match text color with code editor in light mode */
-}
-
-.minimap-highlight {
-    position: absolute;
-    right: 0;
-    width: 120px;
-    background: rgba(100, 100, 100, 0.4); /* Highlight color */
-    border-left: 2px solid #007acc;
-    pointer-events: none;
 }
 
 .minimap-selection {
@@ -905,6 +869,19 @@ body.light-mode .minimap-content {
     right: 0;
     width: 120px;
     background: rgba(0, 122, 204, 0.3); /* Change highlight color to blue */
+    pointer-events: all; /* Allow interaction */
+    cursor: pointer;
+    transition: background 0.2s ease;
+    border-left: 2px solid #007acc;
+    backdrop-filter: blur(2px);
+}
+
+.minimap-selection:hover {
+    background: rgba(0, 122, 204, 0.4);
+}
+
+.minimap-code-selection {
+    background: rgba(255, 255, 0, 0.3); /* Highlight selected code in minimap */
     pointer-events: none;
 }
 
